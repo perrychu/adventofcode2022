@@ -2701,10 +2701,24 @@ test_input = '''2,2,2
 2,3,4
 1,2,4'''
 
+import math
 
 scans = set()
+minx = math.inf
+miny = math.inf
+minz = math.inf
+maxx = -math.inf
+maxy = -math.inf
+maxz = -math.inf
 for r in input.splitlines():
-    scans.add(tuple([int(v) for v in r.split(',')]))
+    point = tuple([int(v) for v in r.split(',')])
+    minx = min(minx,point[0])
+    miny = min(miny,point[1])
+    minz = min(minz,point[2])
+    maxx = max(maxx,point[2])
+    maxy = max(maxy,point[2])
+    maxz = max(maxz,point[2])
+    scans.add(point)
 
 adjacent = set()
 
@@ -2716,42 +2730,32 @@ for p in scans:
             total+=1
             adjacent.add(side)
 
+queue = set([(minx-1,miny-1,minz-1)])
+external = set()
+
 run_count = 0
-prior_adj = -1
-while True:
-    new_adjacent = set()
-    for p in adjacent:
-        external = False
-        for x,y,z in [(-1,0,0),(1,0,0),(0,1,0),(0,-1,0),(0,0,1),(0,0,-1)]:
-            side = (p[0]+x,p[1]+y,p[2]+z)
-            # if p == (4,2,5):
-            #     print("checking",p,"for",side)
-            #     print(side not in scans, side not in adjacent)
-            if (side not in scans) and (side not in adjacent):
-                external = True
-                break
-        if external == False:
-            new_adjacent.add(p)
-    adjacent = new_adjacent
+while len(queue)>0:
+    p = queue.pop()
+    external.add(p)
+    for x,y,z in [(-1,0,0),(1,0,0),(0,1,0),(0,-1,0),(0,0,1),(0,0,-1)]:
+        side = (p[0]+x,p[1]+y,p[2]+z)
+        if side[0]>= minx-1 and side[0]<= maxx+1 and side[1]>=miny-1 and side[1]<=maxy+1 and side[2]>=minz-1 and side[2]<=maxz+1:
+            if side not in scans and side not in external:
+                queue.add(side)
     run_count += 1
-
-    if run_count % 1 == 0:
-        print(run_count,len(adjacent),adjacent)
-    if len(adjacent) == prior_adj and run_count >=7 :
-        break
-    prior_adj = len(adjacent)
-
+    if run_count % 1000 == 0:
+        print(run_count,len(queue))
 
 total_ext = 0
 for p in scans:
     for x,y,z in [(-1,0,0),(1,0,0),(0,1,0),(0,-1,0),(0,0,1),(0,0,-1)]:
         side = (p[0]+x,p[1]+y,p[2]+z)
-        if (side not in scans) and (side not in adjacent):
+        if side in external:
             total_ext+=1
 
 
 print("*** total", total)
 
-print("*** len adj", len(adjacent))
+# print("*** len adj", len(adjacent))
 
 print("*** total ext", total_ext)
