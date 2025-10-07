@@ -1,7 +1,8 @@
 name: 🐞 Bug
 description: File a bug/issue
 title: "[BUG] <title>"
-labels: ["Bug", "Needs Triage"]
+labels: ["bug"]
+type: Task
 body:
 - type: checkboxes
   attributes:
