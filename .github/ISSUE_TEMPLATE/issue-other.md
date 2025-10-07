@@ -4,7 +4,7 @@ about: Create a report for other issues
 title: "[Other] (Title here)"
 labels:
 assignees: ''
-
+type: Task
 ---
 
 ### Description:
